@@ -2,28 +2,16 @@
   description = "Shared Nix definitions for a development environment";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs =
     {
       self,
       nixpkgs,
-      nixpkgs-unstable,
       flake-utils,
       ...
     }:
     let
-      # Needed for bitwarden-cli: https://github.com/NixOS/nixpkgs/issues/339576
-      bitwardenOverlay = final: prev: {
-        bitwarden-cli = prev.bitwarden-cli.overrideAttrs (oldAttrs: {
-          nativeBuildInputs = (oldAttrs.nativeBuildInputs or [ ]) ++ [
-            prev.llvmPackages_18.stdenv.cc
-          ];
-          stdenv = prev.llvmPackages_18.stdenv;
-        });
-      };
-
       project =
         pkgsConfig: f:
         flake-utils.lib.eachDefaultSystem (
@@ -33,17 +21,8 @@
               inherit system;
               config = pkgsConfig;
             };
-
-            unstablePkgs = import nixpkgs-unstable {
-              inherit system;
-              overlays = [ bitwardenOverlay ];
-            };
-
-            pkgsWithUnstable = pkgs // {
-              unstable = unstablePkgs;
-            };
           in
-          (f pkgsWithUnstable)
+          (f pkgs)
           // {
             formatter = pkgs.nixfmt-rfc-style;
           }
