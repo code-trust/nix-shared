@@ -1,7 +1,7 @@
 {
   description = "Shared Nix definitions for a development environment";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/release-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/release-25.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs =
